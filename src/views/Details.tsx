@@ -13,7 +13,7 @@ function Details() {
 
     const { id } = useParams();
     const product = products.find((each) => each.id === id);
-    debugger;
+    // debugger;
     if (product) {
         return <>
             <NavBar />

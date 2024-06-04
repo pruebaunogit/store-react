@@ -1,10 +1,60 @@
-import { useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import styles from "./Checkout.module.css";
 
 export default function Checkout({ product }) {
 
     const [quantity, setQuantity] = useState(1);
     const [button, setButton] = useState(false);
+
+    const units = useRef(1)
+
+    useEffect(() => {
+        console.log("useEffect");
+        let productsOnCart = [];
+        if (localStorage.getItem("cart")) {
+            productsOnCart = JSON.parse(localStorage.getItem("cart"));
+        } else {
+            localStorage.setItem("cart", JSON.stringify([]));
+        }
+        const one = productsOnCart.find((item) => item.id === product.id);
+        if (one) {
+            setQuantity(one.units);
+            setButton(true);
+        } else {
+            setQuantity(1);
+            setButton(false);
+        }
+    }, [product.id]);
+
+
+    let productsInStorage = [];
+    !localStorage.getItem("cart")
+        ? localStorage.setItem("cart", JSON.stringify([]))
+        : (productsInStorage = JSON.parse(localStorage.getItem("cart")));
+
+    const manageCart = () => {
+        console.log("manageCart");
+        let productsOnCart = [];
+        if (localStorage.getItem("cart")) {
+            productsOnCart = JSON.parse(localStorage.getItem("cart"));
+        }
+        const one = productsInStorage.find(
+            each => each.id === product.id
+        );
+        if (!one) {
+            product.units = quantity;
+            productsInStorage.push(product);
+            setButton(true);
+        } else {
+            productsInStorage = productsInStorage.filter(
+                each => each.id !== product.id
+            );
+            setButton(false);
+        }
+        localStorage.setItem("cart", JSON.stringify(productsInStorage));
+    };
+
+
 
     return <div className={styles["product-checkout-block"]}>
         <div className={styles["checkout-container"]}>
@@ -43,14 +93,17 @@ export default function Checkout({ product }) {
                         id="input-quantity"
                         type="number"
                         min="1"
-                        defaultValue={quantity}
-                        onChange={(event) => setQuantity(Number(event?.target.value))}
+                        value={quantity}
+                        // onChange={(event) => setQuantity(Number(event?.target.value))
+                        ref={units}
+                        onChange={() => setQuantity(Number(units.current.value))}
                     />
 
                     <button
                         type="button"
                         className={button ? styles["remove-btn"] : styles["cart-btn"]}
-                        onClick={() => setButton(!button)}
+                        // onClick={() => setButton(!button)}
+                        onClick={manageCart}
                     >
                         {button ? "Remover del carrito" : "Añadir al Carrito"}
                     </button>

@@ -1,8 +1,12 @@
 
+import { useEffect, useState } from "react";
 import styles from "./Thumbs.module.css";
 
 export default function Thumbs({product}) {
-    // const { id, title, color, price, image,description } = props
+    
+    const [thumb, setThumb] = useState(product.images[0] || "/mock1.jpg");
+
+     useEffect(() => setThumb(product.images[0]), [product.id]);
     return (
         <section className={styles["product-images-block"]}>
           <div className={styles["product-images"]}>
@@ -12,13 +16,14 @@ export default function Thumbs({product}) {
                 key={each}
                 src={each}
                 alt={product.title}
+                onClick={() => setThumb(each)}
               />
             ))}
           </div>
           <img
             className={styles["big-img"]}
             id="big-img"
-            src={product.images[0]}
+            src={thumb}
             alt={product.title}
           />
         </section>
